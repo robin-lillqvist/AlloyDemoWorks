@@ -28,6 +28,7 @@ public class Startup
         services
             .AddCmsAspNetIdentity<ApplicationUser>()
             .AddCms()
+            .AddFind()
             .AddAlloy()
             .AddAdminUserRegistration()
             .AddEmbeddedLocalization<Startup>();
