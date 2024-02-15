@@ -2,41 +2,41 @@ using AlloyDemo.Models.Pages;
 using AlloyDemo.Models.ViewModels;
 using EPiServer.Find;
 using EPiServer.Find.UnifiedSearch;
+using EPiServer.Shell.ViewComposition;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
-
-namespace AlloyDemo.Controllers;
-
-public class SearchPageController : PageControllerBase<SearchPage>
+namespace AlloyDemo.Controllers
 {
-    private readonly IClient searchClient;
-    public SearchPageController(IClient searchClient)
+    public class SearchPageController : PageControllerBase<SearchPage>
     {
-        this.searchClient = searchClient;
-    }
-
-    public ViewResult Index(SearchPage currentPage, string q)
-    {
-        var model = new SearchContentModel(currentPage)
+        private readonly IClient searchClient;
+        public SearchPageController(IClient searchClient)
         {
-            Hits = Enumerable.Empty<SearchContentModel.SearchHit>(),
-            NumberOfHits = 0,
-            SearchServiceDisabled = true,
-            SearchedQuery = q
-        };
-
-        if(!string.IsNullOrWhiteSpace(q)) {
-            UnifiedSearchResults results = searchClient.UnifiedSearchFor(q).GetResult();
-
-            model.Hits = results.Hits.Select(hit =>
-            new SearchContentModel.SearchHit
-            {
-                Title = hit.Document.Title,
-                Url = hit.Document.Url,
-                Excerpt = hit.Document.Excerpt,
-            });
-            model.NumberOfHits = results.TotalMatching;
+            this.searchClient = searchClient;
         }
-
-        return View(model);
+        public ViewResult Index(SearchPage currentPage, string q)
+        {
+            var model = new SearchContentModel(currentPage)
+            {
+                Hits = Enumerable.Empty<SearchContentModel.SearchHit>(),
+                NumberOfHits = 0,
+                SearchServiceDisabled = false,
+                SearchedQuery = q
+            };
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                UnifiedSearchResults results = searchClient
+                .UnifiedSearchFor(q).GetResult();
+                model.Hits = results.Hits.Select(hit =>
+                new SearchContentModel.SearchHit()
+                {
+                    Title = hit.Document.Title,
+                    Url = hit.Document.Url,
+                    Excerpt = hit.Document.Excerpt
+                });
+                model.NumberOfHits = results.TotalMatching;
+            }
+            return View(model);
+        }
     }
 }
