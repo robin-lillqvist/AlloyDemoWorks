@@ -4,6 +4,8 @@ using EPiServer.Cms.UI.AspNetIdentity;
 using EPiServer.Scheduler;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using EPiServer.Cms.TinyMce.Core; // TinyMceConfiguration
+using Microsoft.Extensions.DependencyInjection; // IServiceCollection
 
 namespace AlloyDemo;
 
@@ -35,13 +37,13 @@ public class Startup
 
         // Required by Wangkanai.Detection
         services.AddDetection();
-
         services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromSeconds(10);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
         });
+        services.AddTinyMceCustomizations();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
